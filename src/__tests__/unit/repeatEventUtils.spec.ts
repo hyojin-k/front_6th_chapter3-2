@@ -32,7 +32,21 @@ describe('repeatEventUtils', () => {
       expect(repeatEvents[6].date).toBe('2025-08-31');
     });
 
-    it('매주 반복 일정을 생성한다', () => {});
+    it('매주 반복 일정을 생성한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2025-08-25',
+        repeat: { type: 'weekly', interval: 1, endDate: '2025-09-15' },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-09-15'));
+
+      expect(repeatEvents).toHaveLength(4);
+      expect(repeatEvents[0].date).toBe('2025-08-25');
+      expect(repeatEvents[1].date).toBe('2025-09-01');
+      expect(repeatEvents[2].date).toBe('2025-09-08');
+      expect(repeatEvents[3].date).toBe('2025-09-15');
+    });
 
     it('매월 반복 일정을 생성한다', () => {});
 
