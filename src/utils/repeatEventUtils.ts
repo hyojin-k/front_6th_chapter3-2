@@ -14,6 +14,9 @@ function getNextRepeatDate(currentDate: Date, repeatType: RepeatType, interval: 
     case 'weekly':
       nextDate.setDate(nextDate.getDate() + 7 * interval);
       break;
+    case 'monthly':
+      nextDate.setMonth(nextDate.getMonth() + interval);
+      break;
     default:
       break;
   }
