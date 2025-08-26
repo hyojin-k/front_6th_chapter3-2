@@ -1,7 +1,36 @@
+import { Event } from '../../types';
+import { generateRepeatEvents } from '../../utils/repeatEventUtils';
+
 describe('repeatEventUtils', () => {
-  // todo fix title
-  describe('반복 유형 선택 및 생성', () => {
-    it('매일 반복 일정을 생성한다', () => {});
+  const event: Event = {
+    id: '1',
+    title: '테스트 이벤트',
+    date: '2025-08-25',
+    startTime: '09:00',
+    endTime: '10:00',
+    description: '테스트 설명',
+    location: '테스트 장소',
+    category: '업무',
+    repeat: {
+      type: 'none',
+      interval: 1,
+    },
+    notificationTime: 10,
+  };
+
+  describe('generateRepeatEvents', () => {
+    it('매일 반복 일정을 생성한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        repeat: { type: 'daily', interval: 1, endDate: '2025-08-31' },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-08-31'));
+
+      expect(repeatEvents).toHaveLength(7);
+      expect(repeatEvents[0].date).toBe('2025-08-25');
+      expect(repeatEvents[6].date).toBe('2025-08-31');
+    });
 
     it('매주 반복 일정을 생성한다', () => {});
 
