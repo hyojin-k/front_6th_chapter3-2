@@ -95,7 +95,19 @@ describe('repeatEventUtils', () => {
       expect(repeatEvents[2].date).toBe('2025-05-31');
     });
 
-    it('윤년 29일에 매년 반복을 선택하면 29일에만 생성한다', () => {});
+    it('윤년 29일에 매년 반복을 선택하면 29일에만 생성한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2024-02-29',
+        repeat: { type: 'yearly', interval: 1, endDate: '2030-02-28' },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2030-02-28'));
+
+      expect(repeatEvents).toHaveLength(2);
+      expect(repeatEvents[0].date).toBe('2024-02-29');
+      expect(repeatEvents[1].date).toBe('2028-02-29');
+    });
   });
 
   describe('반복 일정 표시', () => {
