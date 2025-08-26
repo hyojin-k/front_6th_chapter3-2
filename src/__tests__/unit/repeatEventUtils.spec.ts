@@ -80,7 +80,20 @@ describe('repeatEventUtils', () => {
       expect(repeatEvents[3].date).toBe('2028-08-25');
     });
 
-    it('31일에 매월 반복을 선택하면 31일에만 생성한다', () => {});
+    it('31일에 매월 반복을 선택하면 31일에만 생성한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2025-01-31',
+        repeat: { type: 'monthly', interval: 1, endDate: '2025-06-30' },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-06-30'));
+
+      expect(repeatEvents).toHaveLength(3);
+      expect(repeatEvents[0].date).toBe('2025-01-31');
+      expect(repeatEvents[1].date).toBe('2025-03-31');
+      expect(repeatEvents[2].date).toBe('2025-05-31');
+    });
 
     it('윤년 29일에 매년 반복을 선택하면 29일에만 생성한다', () => {});
   });
