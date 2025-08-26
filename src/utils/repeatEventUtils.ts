@@ -14,9 +14,15 @@ function getNextRepeatDate(currentDate: Date, repeatType: RepeatType, interval: 
     case 'weekly':
       nextDate.setDate(nextDate.getDate() + 7 * interval);
       break;
-    case 'monthly':
+    case 'monthly': {
+      const originalDay = nextDate.getDate();
       nextDate.setMonth(nextDate.getMonth() + interval);
+
+      if (nextDate.getDate() !== originalDay) {
+        nextDate.setDate(originalDay);
+      }
       break;
+    }
     case 'yearly':
       nextDate.setFullYear(nextDate.getFullYear() + interval);
       break;
@@ -25,6 +31,17 @@ function getNextRepeatDate(currentDate: Date, repeatType: RepeatType, interval: 
   }
 
   return nextDate;
+}
+
+/**
+ * 날짜가 유효한지 확인
+ */
+function isValidRepeatDate(originalDate: Date, newDate: Date, repeatType: RepeatType): boolean {
+  if (repeatType === 'monthly') {
+    return originalDate.getDate() === newDate.getDate();
+  }
+
+  return true;
 }
 
 /**
@@ -39,17 +56,15 @@ export function generateRepeatEvents(event: Event, endDate: Date): Event[] {
   const startDate = new Date(event.date);
   let currentDate = new Date(startDate);
 
-  while (currentDate <= endDate) {
-    if (endDate && currentDate > endDate) {
-      break;
-    }
+  const repeatEndDate = new Date(event.repeat.endDate ?? '');
+  const finalEndDate = repeatEndDate && repeatEndDate < endDate ? repeatEndDate : endDate;
 
-    if (currentDate >= startDate) {
-      const newEvent: Event = {
+  while (currentDate <= finalEndDate) {
+    if (isValidRepeatDate(startDate, currentDate, event.repeat.type)) {
+      events.push({
         ...event,
         date: formatDateToString(currentDate),
-      };
-      events.push(newEvent);
+      });
     }
 
     currentDate = getNextRepeatDate(currentDate, event.repeat.type, event.repeat.interval);
