@@ -111,7 +111,23 @@ describe('repeatEventUtils', () => {
   });
 
   describe('반복 종료 조건', () => {
-    it('특정 날짜까지 반복한다', () => {});
+    it('특정 날짜까지 반복한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2025-08-25',
+        repeat: {
+          type: 'daily',
+          interval: 1,
+          endDate: '2025-08-30',
+        },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-10-30'));
+
+      expect(repeatEvents).toHaveLength(6);
+      expect(repeatEvents[0].date).toBe('2025-08-25');
+      expect(repeatEvents[5].date).toBe('2025-08-30');
+    });
 
     it('특정 횟수만큼 반복한다', () => {});
 
