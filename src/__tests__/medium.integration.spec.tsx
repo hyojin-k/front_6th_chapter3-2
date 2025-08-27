@@ -340,3 +340,53 @@ it('notificationTime을 10으로 하면 지정 시간 10분 전 알람 텍스트
 
   expect(screen.getByText('10분 후 기존 회의 일정이 시작됩니다.')).toBeInTheDocument();
 });
+
+it('반복 일정은 캘린더에서 반복 아이콘이 표시된다.', async () => {
+  server.use(
+    http.get('/api/events', () => {
+      return HttpResponse.json({
+        events: [
+          {
+            id: '1',
+            title: '매일 반복 회의',
+            date: '2025-10-15',
+            startTime: '09:00',
+            endTime: '10:00',
+            description: '매일 반복 회의',
+            location: '회의실',
+            category: '업무',
+            repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
+            notificationTime: 10,
+          },
+          {
+            id: '2',
+            title: '단일 회의',
+            date: '2025-10-15',
+            startTime: '11:00',
+            endTime: '12:00',
+            description: '단일 회의',
+            location: '회의실',
+            category: '업무',
+            repeat: { type: 'none', interval: 1 },
+            notificationTime: 10,
+          },
+        ],
+      });
+    })
+  );
+
+  setup(<App />);
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  const table = screen.getByRole('table');
+  const dayCell = within(table).getByText('15').closest('td');
+
+  const repeatEventBox = within(dayCell!).getByText('매일 반복 회의').closest('div');
+  expect(within(repeatEventBox!).getByTestId('repeat-icon')).toBeInTheDocument();
+
+  const singleEventBox = within(dayCell!).getByText('단일 회의').closest('div');
+  expect(within(singleEventBox!).queryByTestId('repeat-icon')).not.toBeInTheDocument();
+});
