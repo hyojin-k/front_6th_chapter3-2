@@ -51,6 +51,13 @@ function isValidRepeatDate(originalDate: Date, newDate: Date, repeatType: Repeat
 }
 
 /**
+ * 반복 일정인지 확인
+ */
+export function isRepeatEvent(event: Event): boolean {
+  return event.repeat.type !== 'none';
+}
+
+/**
  * 반복 일정 생성
  */
 export function generateRepeatEvents(event: Event, endDate: Date): Event[] {

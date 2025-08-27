@@ -1,4 +1,12 @@
-import { Notifications, ChevronLeft, ChevronRight, Delete, Edit, Close } from '@mui/icons-material';
+import {
+  Notifications,
+  ChevronLeft,
+  ChevronRight,
+  Delete,
+  Edit,
+  Close,
+  Repeat,
+} from '@mui/icons-material';
 import {
   Alert,
   AlertTitle,
@@ -46,6 +54,7 @@ import {
 } from './utils/dateUtils';
 import { findOverlappingEvents } from './utils/eventOverlap';
 import { getTimeErrorMessage } from './utils/timeValidation';
+import { isRepeatEvent } from './utils/repeatEventUtils';
 
 const categories = ['업무', '개인', '가족', '기타'];
 
@@ -287,6 +296,9 @@ function App() {
                                 >
                                   <Stack direction="row" spacing={1} alignItems="center">
                                     {isNotified && <Notifications fontSize="small" />}
+                                    {isRepeatEvent(event) && (
+                                      <Repeat fontSize="small" data-testid="repeat-icon" />
+                                    )}
                                     <Typography
                                       variant="caption"
                                       noWrap
