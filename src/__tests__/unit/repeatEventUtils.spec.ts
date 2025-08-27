@@ -129,9 +129,21 @@ describe('repeatEventUtils', () => {
       expect(repeatEvents[5].date).toBe('2025-08-30');
     });
 
-    it('특정 횟수만큼 반복한다', () => {});
+    it('종료 날짜가 없으면 지정된 기간까지 반복한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2025-10-15',
+        repeat: {
+          type: 'daily',
+          interval: 1,
+        },
+      };
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-10-30'));
 
-    it('종료 날짜가 없으면 지정된 기간까지 반복한다', () => {});
+      expect(repeatEvents.length).toBeGreaterThan(15);
+      expect(repeatEvents[0].date).toBe('2025-10-15');
+      expect(repeatEvents[repeatEvents.length - 1].date).toBe('2025-10-30');
+    });
   });
 
   describe('반복 일정 단일 수정', () => {
