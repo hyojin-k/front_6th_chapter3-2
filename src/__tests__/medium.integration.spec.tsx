@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within, act } from '@testing-library/react';
+import { render, screen, within, act, fireEvent } from '@testing-library/react';
 import { UserEvent, userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
@@ -389,4 +389,63 @@ it('반복 일정은 캘린더에서 반복 아이콘이 표시된다.', async (
 
   const singleEventBox = within(dayCell!).getByText('단일 회의').closest('div');
   expect(within(singleEventBox!).queryByTestId('repeat-icon')).not.toBeInTheDocument();
+});
+
+it('반복 일정 수정 시 반복 일정을 해제하면 단일 일정으로 변경 후 반복 아이콘이 사라진다.', async () => {
+  let currentEvent = {
+    id: '1',
+    title: '매일 반복 회의',
+    date: '2025-10-15',
+    startTime: '09:00',
+    endTime: '10:00',
+    description: '매일 반복 회의',
+    location: '회의실',
+    category: '업무',
+    repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
+    notificationTime: 10,
+  };
+
+  server.use(
+    http.get('/api/events', () => {
+      return HttpResponse.json({
+        events: [currentEvent],
+      });
+    }),
+    http.put('/api/events/:id', async ({ request, params }) => {
+      const eventData = (await request.json()) as typeof currentEvent;
+      currentEvent = { ...eventData, id: params.id as string };
+      return HttpResponse.json(currentEvent);
+    })
+  );
+
+  const { user } = setup(<App />);
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  const table = screen.getByRole('table');
+  const dayCell = within(table).getByText('15').closest('td');
+
+  const repeatEventText = within(dayCell!).getByText('매일 반복 회의');
+  await user.click(repeatEventText);
+
+  const editButton = screen.getByLabelText('Edit event');
+  await user.click(editButton);
+
+  const repeatCheckbox = screen.getByLabelText('반복 일정');
+  expect(repeatCheckbox).toBeChecked();
+
+  await user.click(repeatCheckbox);
+
+  expect(repeatCheckbox).not.toBeChecked();
+
+  const saveButton = screen.getByTestId('event-submit-button');
+  await user.click(saveButton);
+
+  expect(currentEvent.repeat.type).toBe('none');
+
+  // 반복 일정 아이콘 삭제
+  const eventBox = within(dayCell!).getByText('매일 반복 회의').closest('div');
+  expect(within(eventBox!).queryByTestId('repeat-icon')).not.toBeInTheDocument();
 });
