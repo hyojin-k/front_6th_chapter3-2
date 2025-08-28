@@ -108,3 +108,11 @@ export function generateRepeatEvents(event: Event, endDate: Date): Event[] {
 
   return events;
 }
+
+export function removeRepeatEventOnDate(events: Event[], targetDate: string): Event[] {
+  if (!events.length || !targetDate) {
+    return events;
+  }
+
+  return events.filter((event) => event.date !== targetDate);
+}
