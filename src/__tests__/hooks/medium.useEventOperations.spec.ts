@@ -5,6 +5,7 @@ import {
   setupMockHandlerCreation,
   setupMockHandlerDeletion,
   setupMockHandlerUpdating,
+  setupMockHandlerEventsListCreation,
 } from '../../__mocks__/handlersUtils.ts';
 import { useEventOperations } from '../../hooks/useEventOperations.ts';
 import { server } from '../../setupTests.ts';
@@ -173,91 +174,7 @@ it("네트워크 오류 시 '일정 삭제 실패'라는 텍스트가 노출되�
 });
 
 it('반복 일정 등록 시 여러 개의 이벤트가 생성되어야 한다', async () => {
-  server.use(
-    http.post('/api/events-list', () => {
-      return HttpResponse.json([
-        {
-          id: '1',
-          title: '매일 반복 회의',
-          date: '2025-10-15',
-          startTime: '09:00',
-          endTime: '10:00',
-          description: '매일 반복 회의',
-          location: '회의실 A',
-          category: '업무',
-          repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-          notificationTime: 10,
-        },
-        {
-          id: '2',
-          title: '매일 반복 회의',
-          date: '2025-10-16',
-          startTime: '09:00',
-          endTime: '10:00',
-          description: '매일 반복 회의',
-          location: '회의실 A',
-          category: '업무',
-          repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-          notificationTime: 10,
-        },
-        {
-          id: '3',
-          title: '매일 반복 회의',
-          date: '2025-10-17',
-          startTime: '09:00',
-          endTime: '10:00',
-          description: '매일 반복 회의',
-          location: '회의실 A',
-          category: '업무',
-          repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-          notificationTime: 10,
-        },
-      ]);
-    }),
-
-    http.get('/api/events', () => {
-      return HttpResponse.json({
-        events: [
-          {
-            id: '1',
-            title: '매일 반복 회의',
-            date: '2025-10-15',
-            startTime: '09:00',
-            endTime: '10:00',
-            description: '매일 반복 회의',
-            location: '회의실 A',
-            category: '업무',
-            repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-            notificationTime: 10,
-          },
-          {
-            id: '2',
-            title: '매일 반복 회의',
-            date: '2025-10-16',
-            startTime: '09:00',
-            endTime: '10:00',
-            description: '매일 반복 회의',
-            location: '회의실 A',
-            category: '업무',
-            repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-            notificationTime: 10,
-          },
-          {
-            id: '3',
-            title: '매일 반복 회의',
-            date: '2025-10-17',
-            startTime: '09:00',
-            endTime: '10:00',
-            description: '매일 반복 회의',
-            location: '회의실 A',
-            category: '업무',
-            repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
-            notificationTime: 10,
-          },
-        ],
-      });
-    })
-  );
+  setupMockHandlerEventsListCreation();
 
   const { result } = renderHook(() => useEventOperations(false));
 
