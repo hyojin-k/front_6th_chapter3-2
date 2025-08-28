@@ -1,5 +1,5 @@
 import { Event } from '../../types';
-import { generateRepeatEvents } from '../../utils/repeatEventUtils';
+import { generateRepeatEvents, removeRepeatEventOnDate } from '../../utils/repeatEventUtils';
 
 describe('repeatEventUtils', () => {
   const event: Event = {
@@ -147,6 +147,22 @@ describe('repeatEventUtils', () => {
   });
 
   describe('반복 일정 단일 삭제', () => {
-    it('반복 일정의 특정 날짜만 삭제한다', () => {});
+    it('반복 일정의 특정 날짜만 삭제한다', () => {
+      const repeatEvent: Event = {
+        ...event,
+        date: '2025-10-15',
+        repeat: { type: 'daily', interval: 1, endDate: '2025-10-20' },
+      };
+
+      const repeatEvents = generateRepeatEvents(repeatEvent, new Date('2025-10-20'));
+      expect(repeatEvents).toHaveLength(6);
+
+      const filteredEvents = removeRepeatEventOnDate(repeatEvents, '2025-10-17');
+
+      expect(filteredEvents).toHaveLength(5);
+      const dates = filteredEvents.map((e) => e.date);
+      expect(dates).toEqual(['2025-10-15', '2025-10-16', '2025-10-18', '2025-10-19', '2025-10-20']);
+      expect(dates).not.toContain('2025-10-17');
+    });
   });
 });
